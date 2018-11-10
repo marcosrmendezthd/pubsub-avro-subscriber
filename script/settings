@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+set -e -o pipefail +x
+
+cd "$(dirname "$0")"/..
+
+IMAGE_NAME=pubsub-avro-subscriber
+
+#epoch buildstamp
+BUILD_STAMP=$(date +%s)
+
+# shellcheck disable=2034
+GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+GIT_COMMIT=$(git log --format="%H" -n 1 | cut -c1-12)
+
+# shellcheck disable=2015
+GIT_DIRTY=$(test -n "$(git status --porcelain)" && echo "+CHANGES" || true)
+APP_VERSION="$(git describe --tags --exact-match 2> /dev/null | head -n 1 || echo "")"
+LD_FLAGS="-X main.GitCommit=${GIT_COMMIT}${GIT_DIRTY}"
+LD_FLAGS="$LD_FLAGS -X main.BuildStamp=${BUILD_STAMP}"
+LD_FLAGS="$LD_FLAGS -X main.GitBranch=${GIT_BRANCH}"
+
+if [ "$APP_VERSION" != "" ]; then
+    LD_FLAGS="$LD_FLAGS -X main.Version=${APP_VERSION}"
+fi
+
+# shellcheck disable=2034
+GO111MODULE=on
+
+

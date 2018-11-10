@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+set -eo pipefail
+IFS=$'\n\t'
+
+cd "$(dirname "$0")"/..
+
+source script/settings
+source script/common
+
+taskStart "cibuild"
+
+compile "linux" "amd64"
+compile "darwin" "amd64"
+compile "windows" "amd64"
+
+taskEnd
+
+echo ""
+git status

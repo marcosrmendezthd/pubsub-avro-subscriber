@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+set -eo pipefail
+IFS=$'\n\t'
+
+function taskStart() {
+    echo -e "\\n==> $1\\n"
+}
+
+function taskEnd() {
+    echo -e "\\n==> Done!\\n"
+}
+
+function taskProgress() {
+    echo -e "\\n--> $1\\n"
+}
+
+function taskDebug() {
+    echo -e "~~~~~~~~~~ $1"
+}
+
+function taskError() {
+    echo -e "\\nERR: $1\\n" >&2
+    exit 1
+}
+
+function compile() {
+    taskDebug "compiling ${IMAGE_NAME}_$1_$2"
+    GOOS="$1" GOARCH="$2" go build -ldflags "$LD_FLAGS" -o "${IMAGE_NAME}_$1_$2"
+}
